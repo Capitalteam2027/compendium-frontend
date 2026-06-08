@@ -191,8 +191,17 @@
 </div>
 
 <script>
-  // ── IMPORTANT: Replace this with your actual Railway backend URL after deploying ──
+  // ── IMPORTANT: Replace this with your actual backend URL ──
   const API = 'https://compendium-backend.onrender.com';
+
+  // ── TOKEN stored in memory (lost on tab close — intentional) ──
+  let authToken = sessionStorage.getItem('_fc_token') || null;
+
+  function authHeaders() {
+    const h = { 'Content-Type': 'application/json' };
+    if (authToken) h['Authorization'] = 'Bearer ' + authToken;
+    return h;
+  }
 
   const CHAPTERS = [
     { num:1,  tag:"Orientation",   title:"The Finance Career Landscape",        desc:"Mapping the finance world — five buckets, a dozen very different careers.",             file:"Compendium_Chapter1.html",  ready:true  },
@@ -229,11 +238,13 @@
       const res = await fetch(`${API}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ id, password: pwd }),
       });
 
       if (res.ok) {
+        const data = await res.json();
+        authToken = data.token;
+        sessionStorage.setItem('_fc_token', authToken);
         showPortal();
       } else {
         document.getElementById('login-error').classList.add('show');
@@ -249,7 +260,15 @@
   }
 
   async function doLogout() {
-    await fetch(`${API}/api/logout`, { method: 'POST', credentials: 'include' });
+    try {
+      await fetch(`${API}/api/logout`, {
+        method: 'POST',
+        headers: authHeaders(),
+      });
+    } catch(e) { /* ignore */ }
+
+    authToken = null;
+    sessionStorage.removeItem('_fc_token');
     document.getElementById('portal-screen').style.display = 'none';
     document.getElementById('login-screen').style.display  = 'flex';
     document.getElementById('uid').value = '';
@@ -263,10 +282,18 @@
 
   // ── SESSION CHECK on load ──────────────────────────────────────────
   window.addEventListener('DOMContentLoaded', async () => {
+    if (!authToken) return; // no stored token, stay on login
+
     try {
-      const res  = await fetch(`${API}/api/session`, { credentials: 'include' });
+      const res  = await fetch(`${API}/api/session`, { headers: authHeaders() });
       const data = await res.json();
-      if (data.loggedIn) showPortal();
+      if (data.loggedIn) {
+        showPortal();
+      } else {
+        // Token expired — clear it
+        authToken = null;
+        sessionStorage.removeItem('_fc_token');
+      }
     } catch(e) { /* server unreachable, stay on login */ }
   });
 
@@ -281,7 +308,9 @@
   async function openChapter(filename) {
     document.getElementById('loading-overlay').classList.add('show');
     try {
-      const res = await fetch(`${API}/api/chapter/${filename}`, { credentials: 'include' });
+      const res = await fetch(`${API}/api/chapter/${filename}`, {
+        headers: authHeaders(),
+      });
 
       if (res.status === 401) {
         alert('Session expired. Please log in again.');
