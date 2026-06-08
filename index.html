@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finance Compendium · Review Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#f4f3ef; --card:#ffffff; --ink:#0d0e0a; --ink-soft:#4a4c44;
+    --navy:#1a3d72; --green:#5ab82c; --border:#e0dfd9;
+    --navy-tint:#eaf0f8; --green-tint:#eef6e7;
+    --display:'Outfit',sans-serif; --body:'DM Sans',sans-serif; --mono:'DM Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg); color:var(--ink); font-family:var(--body);
+    line-height:1.7; font-size:16px; -webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(var(--border) 0.5px,transparent 0.5px);
+    background-size:22px 22px; min-height:100vh;
+  }
+
+  /* ---- LOGIN ---- */
+  #login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .login-box{
+    background:var(--card); border:1.5px solid var(--ink); border-radius:24px;
+    padding:52px 48px 44px; width:100%; max-width:440px;
+    box-shadow:6px 6px 0 var(--ink); animation:fadeUp .4s ease both;
+  }
+  @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+  .login-brand{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.01em;margin-bottom:6px}
+  .login-brand b{color:var(--green)}
+  .login-sub{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--ink-soft);margin-bottom:38px;display:block}
+  .login-label{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--navy);font-weight:500;display:block;margin-bottom:8px}
+  .login-input{
+    width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:10px;
+    font-family:var(--body);font-size:15px;color:var(--ink);background:var(--bg);
+    margin-bottom:20px;outline:none;transition:border-color .2s,box-shadow .2s;
+  }
+  .login-input:focus{border-color:var(--navy);box-shadow:0 0 0 3px var(--navy-tint)}
+  .login-btn{
+    width:100%;padding:14px;background:var(--navy);color:#fff;border:none;border-radius:10px;
+    font-family:var(--display);font-weight:700;font-size:16px;letter-spacing:-.01em;
+    cursor:pointer;transition:background .2s,transform .1s;margin-top:4px;
+  }
+  .login-btn:hover{background:#122d5a}
+  .login-btn:active{transform:scale(.98)}
+  .login-btn:disabled{opacity:.6;cursor:not-allowed}
+  .login-error{font-family:var(--mono);font-size:12px;color:#c0392b;letter-spacing:.04em;margin-top:14px;display:none;text-align:center}
+  .login-error.show{display:block}
+  .login-footer{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-soft);margin-top:28px;text-align:center;opacity:.7}
+
+  /* ---- PORTAL ---- */
+  #portal-screen{display:none}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 32px}
+  .masthead{
+    border-bottom:1.5px solid var(--ink);margin-top:32px;padding-bottom:14px;
+    display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;
+  }
+  .masthead .brand{font-family:var(--display);font-weight:800;font-size:20px;letter-spacing:-.01em}
+  .masthead .brand b{color:var(--green)}
+  .masthead .right{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .masthead .meta{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-soft);text-align:right}
+  .logout-btn{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-soft);background:none;border:1px solid var(--border);border-radius:6px;padding:5px 12px;cursor:pointer;transition:border-color .2s,color .2s}
+  .logout-btn:hover{border-color:var(--ink);color:var(--ink)}
+
+  .portal-hero{padding:52px 0 28px;border-bottom:1px dashed var(--border);margin-bottom:40px}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--green);font-weight:500;margin-bottom:10px;display:block}
+  .portal-hero h1{font-family:var(--display);font-weight:800;font-size:clamp(30px,5vw,50px);letter-spacing:-.025em;line-height:1.05}
+  .portal-hero p{font-size:17px;color:var(--ink-soft);margin-top:16px;max-width:52ch}
+
+  .controls{display:flex;gap:14px;margin-bottom:28px;flex-wrap:wrap;align-items:center}
+  .search-wrap{flex:1;min-width:200px;position:relative}
+  .search-wrap svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--ink-soft);pointer-events:none}
+  .search-input{width:100%;padding:11px 16px 11px 40px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--body);font-size:14px;background:var(--card);color:var(--ink);outline:none;transition:border-color .2s}
+  .search-input:focus{border-color:var(--navy)}
+  .stats-chips{display:flex;gap:8px;flex-wrap:wrap}
+  .stat-chip{font-family:var(--mono);font-size:11px;letter-spacing:.08em;padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--ink-soft);white-space:nowrap}
+  .stat-chip b{color:var(--navy)}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px;padding-bottom:70px}
+
+  .chapter-card{
+    background:var(--card);border:1.5px solid var(--border);border-radius:16px;
+    padding:26px 26px 22px;display:flex;flex-direction:column;
+    cursor:pointer;text-decoration:none;color:var(--ink);
+    transition:transform .22s ease,box-shadow .22s ease,border-color .22s;
+    position:relative;overflow:hidden;animation:cardIn .35s ease both;
+  }
+  .chapter-card:hover{transform:translateY(-5px);box-shadow:0 18px 36px -20px rgba(26,61,114,.35);border-color:var(--navy)}
+  @keyframes cardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  .card-num{font-family:var(--display);font-weight:800;font-size:72px;color:var(--navy-tint);line-height:1;position:absolute;top:-8px;right:-4px;z-index:0;letter-spacing:-.04em}
+  .card-body{position:relative;z-index:1;flex:1}
+  .card-tag{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--green);font-weight:500;display:block;margin-bottom:8px}
+  .card-title{font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:-.01em;line-height:1.2;margin-bottom:10px}
+  .card-desc{font-size:13.5px;color:var(--ink-soft);line-height:1.55}
+  .card-footer{position:relative;z-index:1;margin-top:20px;padding-top:14px;border-top:1px dashed var(--border);display:flex;justify-content:space-between;align-items:center}
+  .card-file{font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);letter-spacing:.04em}
+  .card-arrow{width:28px;height:28px;background:var(--navy-tint);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0}
+  .chapter-card:hover .card-arrow{background:var(--navy)}
+  .chapter-card:hover .card-arrow svg{color:#fff}
+  .card-arrow svg{width:13px;height:13px;color:var(--navy);transition:color .2s}
+
+  .no-results{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--ink-soft);font-family:var(--mono);font-size:13px;letter-spacing:.08em;text-transform:uppercase;display:none}
+
+  .portal-footer{border-top:1.5px solid var(--ink);padding:20px 0 50px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-soft);flex-wrap:wrap;gap:8px}
+
+  /* loading overlay */
+  #loading-overlay{
+    display:none;position:fixed;inset:0;background:rgba(244,243,239,.9);
+    z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:16px;
+  }
+  #loading-overlay.show{display:flex}
+  .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading-text{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-soft)}
+
+  @media(max-width:600px){
+    .login-box{padding:38px 28px 34px}
+    .wrap{padding:0 18px}
+    .grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <div class="loading-text">Opening chapter…</div>
+</div>
+
+<!-- ==================== LOGIN ==================== -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-brand">Finance Compendium <b>·</b></div>
+    <span class="login-sub">Capital - IIFT Kolkata</span>
+
+    <label class="login-label" for="uid">Reviewer ID</label>
+    <input class="login-input" type="text" id="uid" placeholder="Enter your ID" autocomplete="username"/>
+
+    <label class="login-label" for="pwd">Password</label>
+    <input class="login-input" type="password" id="pwd" placeholder="Enter password" autocomplete="current-password"/>
+
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Access Portal →</button>
+    <div class="login-error" id="login-error">Incorrect credentials. Please try again.</div>
+    <div class="login-footer">For access, contact the Cell coordinator</div>
+  </div>
+</div>
+
+<!-- ==================== PORTAL ==================== -->
+<div id="portal-screen">
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="brand">Finance Compendium <b>·</b> Review Portal</div>
+    <div class="right">
+      <div class="meta">Capital<br>IIFT Kolkata</div>
+      <button class="logout-btn" onclick="doLogout()">Log out</button>
+    </div>
+  </header>
+
+  <section class="portal-hero">
+    <span class="kicker">Internal Review Access</span>
+    <h1>Finance Compendium<br>Chapter Library</h1>
+    <p>All nineteen chapters available for review. Click any card to open the chapter securely in a new tab.</p>
+  </section>
+
+  <div class="controls">
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="search-input" type="text" id="search" placeholder="Search chapters…" oninput="filterCards()"/>
+    </div>
+    <div class="stats-chips">
+      <div class="stat-chip"><b>19</b> Chapters</div>
+      <div class="stat-chip" id="visible-count"><b>19</b> Showing</div>
+    </div>
+  </div>
+
+  <div class="grid" id="chapter-grid"></div>
+
+  <footer class="portal-footer">
+    <span>Finance Compendium · Internal Review Portal</span>
+    <span>Capital · IIFT Kolkata</span>
+  </footer>
+
+</div>
+</div>
+
+<script>
+  // ── IMPORTANT: Replace this with your actual Railway backend URL after deploying ──
+  const API = 'https://your-backend.up.railway.app';
+
+  const CHAPTERS = [
+    { num:1,  tag:"Orientation",   title:"The Finance Career Landscape",        desc:"Mapping the finance world — five buckets, a dozen very different careers.",             file:"Compendium_Chapter1.html",  ready:true  },
+    { num:2,  tag:"Accounting",    title:"Accounting Foundations",              desc:"The language of business — debits, credits, accruals, and the accounting cycle.",       file:"Compendium_Chapter2.html",  ready:true  },
+    { num:3,  tag:"Statements",    title:"Balance Sheet & Income Statement",    desc:"Reading assets, liabilities, equity, revenues, and expenses as one coherent story.",   file:"Compendium_Chapter3.html",  ready:true  },
+    { num:4,  tag:"Statements",    title:"Cash Flow Statement & Linkages",      desc:"Why profit ≠ cash — the three activities and how all three statements connect.",        file:"Compendium_Chapter4.html",  ready:true  },
+    { num:5,  tag:"Analysis",      title:"Ratio Analysis & Du Pont",            desc:"Liquidity, leverage, profitability, efficiency — and decomposing ROE via Du Pont.",     file:"Compendium_Chapter5.html",  ready:true  },
+    { num:6,  tag:"Valuation",     title:"TVM, NPV & IRR",                      desc:"Time value of money, discounting cash flows, and investment decision rules.",           file:"Compendium_Chapter6.html",  ready:true  },
+    { num:7,  tag:"Modelling",     title:"DCF Modelling",                       desc:"Building a discounted cash flow model from scratch — assumptions to terminal value.",   file:"Compendium_Chapter7.html",  ready:true  },
+    { num:8,  tag:"Investing",     title:"Fundamental Analysis & Investing",    desc:"Top-down vs bottom-up, moats, qualitative filters, and stock-picking frameworks.",     file:"Compendium_Chapter8.html",  ready:true  },
+    { num:9,  tag:"Credit",        title:"Credit Risk",                         desc:"Creditworthiness, rating frameworks, PD/LGD/EAD, and credit analysis in practice.",    file:"Compendium_Chapter9.html",  ready:true  },
+    { num:10, tag:"Derivatives",   title:"Derivatives & Fixed Income",          desc:"Futures, options, bonds, yield curves — pricing and applications.",                    file:"Compendium_Chapter10.html", ready:false },
+    { num:11, tag:"Resources",     title:"Revision Hub & Cheat Sheets",         desc:"Quick-reference summaries, formulas, and revision aids for all chapters.",             file:"Compendium_Chapter11.html", ready:false },
+    { num:12, tag:"Valuation",     title:"Valuation in Practice",               desc:"Comparable companies, precedent transactions, and putting it all together.",           file:"Compendium_Chapter12.html", ready:false },
+    { num:13, tag:"Corp Finance",  title:"Working Capital & Dividend Policy",   desc:"Operating cycle, cash conversion, and how firms decide on dividend payouts.",          file:"Compendium_Chapter13.html", ready:false },
+    { num:14, tag:"Markets",       title:"Financial Markets & Institutions",    desc:"Banks, NBFCs, capital markets, regulators — the financial system mapped.",             file:"Compendium_Chapter14.html", ready:false },
+    { num:15, tag:"Macro",         title:"Forex & Macro",                       desc:"Exchange rates, monetary policy, inflation, and macro indicators for finance.",        file:"Compendium_Chapter15.html", ready:false },
+    { num:16, tag:"M&A",           title:"Mergers & Acquisitions",              desc:"Deal structures, synergy analysis, accretion/dilution, and the M&A process.",         file:"Compendium_Chapter16.html", ready:false },
+    { num:17, tag:"Project Fin.",  title:"Project Finance",                     desc:"Infrastructure financing, SPVs, debt structuring, and project cash flows.",           file:"Compendium_Chapter17.html", ready:false },
+    { num:18, tag:"Banking",       title:"Banking & CAMELS",                    desc:"Bank business models, NIM, NPA, and the CAMELS rating framework.",                    file:"Compendium_Chapter18.html", ready:false },
+    { num:19, tag:"Careers",       title:"Interview FAQs & PI Experiences",     desc:"Most-asked technical questions, PI tips, and real interview experiences.",             file:"Compendium_Chapter19.html", ready:false },
+  ];
+
+  // ── LOGIN ──────────────────────────────────────────────────────────
+  async function doLogin() {
+    const id  = document.getElementById('uid').value.trim();
+    const pwd = document.getElementById('pwd').value;
+    const btn = document.getElementById('login-btn');
+
+    btn.disabled = true;
+    btn.textContent = 'Checking…';
+
+    try {
+      const res = await fetch(`${API}/api/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ id, password: pwd }),
+      });
+
+      if (res.ok) {
+        showPortal();
+      } else {
+        document.getElementById('login-error').classList.add('show');
+        document.getElementById('pwd').value = '';
+      }
+    } catch (e) {
+      document.getElementById('login-error').textContent = 'Cannot reach server. Try again later.';
+      document.getElementById('login-error').classList.add('show');
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Access Portal →';
+  }
+
+  async function doLogout() {
+    await fetch(`${API}/api/logout`, { method: 'POST', credentials: 'include' });
+    document.getElementById('portal-screen').style.display = 'none';
+    document.getElementById('login-screen').style.display  = 'flex';
+    document.getElementById('uid').value = '';
+    document.getElementById('pwd').value = '';
+    document.getElementById('login-error').classList.remove('show');
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && document.getElementById('login-screen').style.display !== 'none') doLogin();
+  });
+
+  // ── SESSION CHECK on load ──────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const res  = await fetch(`${API}/api/session`, { credentials: 'include' });
+      const data = await res.json();
+      if (data.loggedIn) showPortal();
+    } catch(e) { /* server unreachable, stay on login */ }
+  });
+
+  // ── PORTAL ────────────────────────────────────────────────────────
+  function showPortal() {
+    document.getElementById('login-screen').style.display  = 'none';
+    document.getElementById('portal-screen').style.display = 'block';
+    renderCards(CHAPTERS);
+  }
+
+  // Open chapter — fetches from authenticated backend, opens in new tab
+  async function openChapter(filename) {
+    document.getElementById('loading-overlay').classList.add('show');
+    try {
+      const res = await fetch(`${API}/api/chapter/${filename}`, { credentials: 'include' });
+
+      if (res.status === 401) {
+        alert('Session expired. Please log in again.');
+        doLogout();
+        return;
+      }
+      if (!res.ok) {
+        alert('Chapter not available. Please contact the coordinator.');
+        return;
+      }
+
+      const html = await res.text();
+      const blob = new Blob([html], { type: 'text/html' });
+      const url  = URL.createObjectURL(blob);
+
+      const tab = window.open(url, '_blank');
+
+      // Revoke the blob URL after tab opens so it can't be shared/reused
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+    } catch(e) {
+      alert('Could not load chapter. Check your connection.');
+    } finally {
+      document.getElementById('loading-overlay').classList.remove('show');
+    }
+  }
+
+  // ── CARDS ─────────────────────────────────────────────────────────
+  function renderCards(chapters) {
+    const grid = document.getElementById('chapter-grid');
+    grid.innerHTML = `<div class="no-results" id="no-results-msg" style="display:none">No chapters match your search.</div>`;
+
+    chapters.forEach((ch, i) => {
+      const card = document.createElement('div');
+      card.style.animationDelay = `${i * 40}ms`;
+
+      if (ch.ready) {
+        card.className = 'chapter-card';
+        card.onclick = () => openChapter(ch.file);
+        card.innerHTML = `
+          <div class="card-num">${String(ch.num).padStart(2,'0')}</div>
+          <div class="card-body">
+            <span class="card-tag">Ch. ${String(ch.num).padStart(2,'0')} · ${ch.tag}</span>
+            <div class="card-title">${ch.title}</div>
+            <div class="card-desc">${ch.desc}</div>
+          </div>
+          <div class="card-footer">
+            <span class="card-file" style="color:var(--green);font-weight:500">● Available</span>
+            <div class="card-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </div>
+          </div>`;
+      } else {
+        card.className = 'chapter-card';
+        card.style.opacity = '0.5';
+        card.style.cursor = 'not-allowed';
+        card.style.filter = 'grayscale(0.4)';
+        card.innerHTML = `
+          <div class="card-num">${String(ch.num).padStart(2,'0')}</div>
+          <div class="card-body">
+            <span class="card-tag">Ch. ${String(ch.num).padStart(2,'0')} · ${ch.tag}</span>
+            <div class="card-title">${ch.title}</div>
+            <div class="card-desc">${ch.desc}</div>
+          </div>
+          <div class="card-footer">
+            <span class="card-file" style="color:var(--ink-soft)">⏳ Coming Soon</span>
+            <div class="card-arrow" style="background:var(--border)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <rect x="8" y="11" width="8" height="7" rx="1"/><path d="M10 11V8a2 2 0 1 1 4 0v3"/>
+              </svg>
+            </div>
+          </div>`;
+      }
+      grid.insertBefore(card, document.getElementById('no-results-msg'));
+    });
+  }
+
+  function filterCards() {
+    const q = document.getElementById('search').value.toLowerCase().trim();
+    const filtered = CHAPTERS.filter(ch =>
+      ch.title.toLowerCase().includes(q) ||
+      ch.tag.toLowerCase().includes(q) ||
+      ch.desc.toLowerCase().includes(q) ||
+      String(ch.num).includes(q)
+    );
+    renderCards(filtered);
+    const noMsg = document.getElementById('no-results-msg');
+    if (noMsg) noMsg.style.display = filtered.length === 0 ? 'block' : 'none';
+    document.getElementById('visible-count').innerHTML = `<b>${filtered.length}</b> Showing`;
+  }
+</script>
+</body>
+</html>
