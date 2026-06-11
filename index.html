@@ -3,198 +3,443 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Finance Compendium · Review Portal</title>
+<title>Finance Compendium · Capital IIFT</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
   :root {
-    --bg:#f4f3ef; --card:#ffffff; --ink:#0d0e0a; --ink-soft:#4a4c44;
-    --navy:#1a3d72; --green:#5ab82c; --border:#e0dfd9;
-    --navy-tint:#eaf0f8; --green-tint:#eef6e7;
-    --display:'Outfit',sans-serif; --body:'DM Sans',sans-serif; --mono:'DM Mono',monospace;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{
-    background:var(--bg); color:var(--ink); font-family:var(--body);
-    line-height:1.7; font-size:16px; -webkit-font-smoothing:antialiased;
-    background-image:radial-gradient(var(--border) 0.5px,transparent 0.5px);
-    background-size:22px 22px; min-height:100vh;
+    --navy: #1a3d72;
+    --navy-dark: #122d5a;
+    --green: #3a9e2f;
+    --bg: #f6f6f4;
+    --card: #ffffff;
+    --border: #e2e2de;
+    --ink: #111;
+    --ink-soft: #666;
+    --radius: 10px;
   }
 
-  /* ---- LOGIN ---- */
-  #login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-  .login-box{
-    background:var(--card); border:1.5px solid var(--ink); border-radius:24px;
-    padding:52px 48px 44px; width:100%; max-width:440px;
-    box-shadow:6px 6px 0 var(--ink); animation:fadeUp .4s ease both;
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    font-size: 15px;
+    min-height: 100vh;
   }
-  @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-  .login-brand{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.01em;margin-bottom:6px}
-  .login-brand b{color:var(--green)}
-  .login-sub{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--ink-soft);margin-bottom:38px;display:block}
-  .login-label{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--navy);font-weight:500;display:block;margin-bottom:8px}
-  .login-input{
-    width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:10px;
-    font-family:var(--body);font-size:15px;color:var(--ink);background:var(--bg);
-    margin-bottom:20px;outline:none;transition:border-color .2s,box-shadow .2s;
+
+  /* ── LOGIN ── */
+  #login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
   }
-  .login-input:focus{border-color:var(--navy);box-shadow:0 0 0 3px var(--navy-tint)}
-  .login-btn{
-    width:100%;padding:14px;background:var(--navy);color:#fff;border:none;border-radius:10px;
-    font-family:var(--display);font-weight:700;font-size:16px;letter-spacing:-.01em;
-    cursor:pointer;transition:background .2s,transform .1s;margin-top:4px;
+
+  .login-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 40px 36px 36px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.07);
   }
-  .login-btn:hover{background:#122d5a}
-  .login-btn:active{transform:scale(.98)}
-  .login-btn:disabled{opacity:.6;cursor:not-allowed}
-  .login-error{font-family:var(--mono);font-size:12px;color:#c0392b;letter-spacing:.04em;margin-top:14px;display:none;text-align:center}
-  .login-error.show{display:block}
-  .login-footer{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-soft);margin-top:28px;text-align:center;opacity:.7}
 
-  /* ---- PORTAL ---- */
-  #portal-screen{display:none}
-  .wrap{max-width:1060px;margin:0 auto;padding:0 32px}
-  .masthead{
-    border-bottom:1.5px solid var(--ink);margin-top:32px;padding-bottom:14px;
-    display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;
+  .login-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
   }
-  .masthead .brand{font-family:var(--display);font-weight:800;font-size:20px;letter-spacing:-.01em}
-  .masthead .brand b{color:var(--green)}
-  .masthead .right{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .masthead .meta{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-soft);text-align:right}
-  .logout-btn{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-soft);background:none;border:1px solid var(--border);border-radius:6px;padding:5px 12px;cursor:pointer;transition:border-color .2s,color .2s}
-  .logout-btn:hover{border-color:var(--ink);color:var(--ink)}
 
-  .portal-hero{padding:52px 0 28px;border-bottom:1px dashed var(--border);margin-bottom:40px}
-  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--green);font-weight:500;margin-bottom:10px;display:block}
-  .portal-hero h1{font-family:var(--display);font-weight:800;font-size:clamp(30px,5vw,50px);letter-spacing:-.025em;line-height:1.05}
-  .portal-hero p{font-size:17px;color:var(--ink-soft);margin-top:16px;max-width:52ch}
-
-  .controls{display:flex;gap:14px;margin-bottom:28px;flex-wrap:wrap;align-items:center}
-  .search-wrap{flex:1;min-width:200px;position:relative}
-  .search-wrap svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--ink-soft);pointer-events:none}
-  .search-input{width:100%;padding:11px 16px 11px 40px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--body);font-size:14px;background:var(--card);color:var(--ink);outline:none;transition:border-color .2s}
-  .search-input:focus{border-color:var(--navy)}
-  .stats-chips{display:flex;gap:8px;flex-wrap:wrap}
-  .stat-chip{font-family:var(--mono);font-size:11px;letter-spacing:.08em;padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--ink-soft);white-space:nowrap}
-  .stat-chip b{color:var(--navy)}
-
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px;padding-bottom:70px}
-
-  .chapter-card{
-    background:var(--card);border:1.5px solid var(--border);border-radius:16px;
-    padding:26px 26px 22px;display:flex;flex-direction:column;
-    cursor:pointer;text-decoration:none;color:var(--ink);
-    transition:transform .22s ease,box-shadow .22s ease,border-color .22s;
-    position:relative;overflow:hidden;animation:cardIn .35s ease both;
+  .login-logo .dot {
+    width: 32px; height: 32px;
+    background: var(--navy);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 14px;
   }
-  .chapter-card:hover{transform:translateY(-5px);box-shadow:0 18px 36px -20px rgba(26,61,114,.35);border-color:var(--navy)}
-  @keyframes cardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-  .card-num{font-family:var(--display);font-weight:800;font-size:72px;color:var(--navy-tint);line-height:1;position:absolute;top:-8px;right:-4px;z-index:0;letter-spacing:-.04em}
-  .card-body{position:relative;z-index:1;flex:1}
-  .card-tag{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--green);font-weight:500;display:block;margin-bottom:8px}
-  .card-title{font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:-.01em;line-height:1.2;margin-bottom:10px}
-  .card-desc{font-size:13.5px;color:var(--ink-soft);line-height:1.55}
-  .card-footer{position:relative;z-index:1;margin-top:20px;padding-top:14px;border-top:1px dashed var(--border);display:flex;justify-content:space-between;align-items:center}
-  .card-file{font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);letter-spacing:.04em}
-  .card-arrow{width:28px;height:28px;background:var(--navy-tint);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0}
-  .chapter-card:hover .card-arrow{background:var(--navy)}
-  .chapter-card:hover .card-arrow svg{color:#fff}
-  .card-arrow svg{width:13px;height:13px;color:var(--navy);transition:color .2s}
 
-  .no-results{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--ink-soft);font-family:var(--mono);font-size:13px;letter-spacing:.08em;text-transform:uppercase;display:none}
-
-  .portal-footer{border-top:1.5px solid var(--ink);padding:20px 0 50px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-soft);flex-wrap:wrap;gap:8px}
-
-  /* loading overlay */
-  #loading-overlay{
-    display:none;position:fixed;inset:0;background:rgba(244,243,239,.9);
-    z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:16px;
+  .login-logo .name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
   }
-  #loading-overlay.show{display:flex}
-  .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .loading-text{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-soft)}
 
-  @media(max-width:600px){
-    .login-box{padding:38px 28px 34px}
-    .wrap{padding:0 18px}
-    .grid{grid-template-columns:1fr}
+  .login-logo .sub {
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-top: 1px;
+  }
+
+  .login-box h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    margin-bottom: 6px;
+  }
+
+  .login-box .tagline {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-bottom: 30px;
+  }
+
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: 6px;
+  }
+
+  input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--ink);
+    background: #fafafa;
+    outline: none;
+    transition: border-color .15s;
+    margin-bottom: 18px;
+  }
+
+  input:focus { border-color: var(--navy); background: #fff; }
+
+  .login-btn {
+    width: 100%;
+    padding: 13px;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s;
+    margin-top: 4px;
+  }
+
+  .login-btn:hover { background: var(--navy-dark); }
+  .login-btn:disabled { opacity: .6; cursor: not-allowed; }
+
+  .login-error {
+    font-size: 13px;
+    color: #c0392b;
+    margin-top: 12px;
+    text-align: center;
+    display: none;
+  }
+  .login-error.show { display: block; }
+
+  /* ── PORTAL ── */
+  #portal-screen { display: none; }
+
+  .topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .topbar .brand {
+    font-weight: 700;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .topbar .brand .dot {
+    width: 26px; height: 26px;
+    background: var(--navy);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 12px;
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 16px; }
+
+  .topbar .meta {
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  .logout-btn {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 5px 14px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: border-color .15s, color .15s;
+  }
+  .logout-btn:hover { border-color: #bbb; color: var(--ink); }
+
+  .main { max-width: 1040px; margin: 0 auto; padding: 40px 32px 80px; }
+
+  .page-header { margin-bottom: 32px; }
+  .page-header h1 { font-size: 26px; font-weight: 700; letter-spacing: -.02em; margin-bottom: 6px; }
+  .page-header p { font-size: 14px; color: var(--ink-soft); }
+
+  .controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .search-wrap { position: relative; flex: 1; min-width: 200px; }
+  .search-wrap svg {
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+    width: 15px; height: 15px; color: #aaa; pointer-events: none;
+  }
+  .search-input {
+    width: 100%;
+    padding: 10px 14px 10px 36px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-family: inherit;
+    background: var(--card);
+    color: var(--ink);
+    outline: none;
+    transition: border-color .15s;
+    margin-bottom: 0;
+  }
+  .search-input:focus { border-color: var(--navy); }
+
+  .count-chip {
+    font-size: 12px;
+    color: var(--ink-soft);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 14px;
+    white-space: nowrap;
+  }
+
+  /* Chapter grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+
+  .chapter-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px 18px;
+    cursor: pointer;
+    transition: border-color .18s, box-shadow .18s, transform .18s;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--ink);
+    animation: fadeIn .3s ease both;
+  }
+
+  .chapter-card:hover {
+    border-color: var(--navy);
+    box-shadow: 0 6px 20px rgba(26,61,114,.12);
+    transform: translateY(-2px);
+  }
+
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px) } to { opacity:1; transform:translateY(0) } }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .card-num {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--navy);
+    background: #eaf0f8;
+    border-radius: 5px;
+    padding: 3px 8px;
+    letter-spacing: .04em;
+  }
+
+  .card-tag {
+    font-size: 11px;
+    color: var(--green);
+    font-weight: 600;
+    background: #eef8eb;
+    border-radius: 5px;
+    padding: 3px 8px;
+  }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    line-height: 1.25;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 2px;
+  }
+
+  .card-status {
+    font-size: 11px;
+    color: var(--green);
+    font-weight: 600;
+  }
+
+  .card-arrow {
+    width: 26px; height: 26px;
+    background: #eaf0f8;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .18s;
+    flex-shrink: 0;
+  }
+  .chapter-card:hover .card-arrow { background: var(--navy); }
+  .card-arrow svg { width: 12px; height: 12px; color: var(--navy); transition: color .18s; }
+  .chapter-card:hover .card-arrow svg { color: #fff; }
+
+  .no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    font-size: 14px;
+    color: var(--ink-soft);
+    display: none;
+  }
+
+  /* Loading overlay */
+  #loading-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(246,246,244,.85);
+    z-index: 999;
+    align-items: center; justify-content: center; flex-direction: column; gap: 12px;
+  }
+  #loading-overlay.show { display: flex; }
+  .spinner {
+    width: 32px; height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--navy);
+    border-radius: 50%;
+    animation: spin .65s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { font-size: 13px; color: var(--ink-soft); }
+
+  @media (max-width: 600px) {
+    .topbar { padding: 0 18px; }
+    .main { padding: 28px 18px 60px; }
+    .login-box { padding: 32px 24px 28px; }
+    .grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 
-<!-- Loading overlay -->
+<!-- Loading -->
 <div id="loading-overlay">
   <div class="spinner"></div>
   <div class="loading-text">Opening chapter…</div>
 </div>
 
-<!-- ==================== LOGIN ==================== -->
+<!-- ── LOGIN ── -->
 <div id="login-screen">
   <div class="login-box">
-    <div class="login-brand">Finance Compendium <b>·</b></div>
-    <span class="login-sub">Capital - IIFT Kolkata</span>
+    <div class="login-logo">
+      <div class="dot">FC</div>
+      <div>
+        <div class="name">Finance Compendium</div>
+        <div class="sub">Capital · IIFT Kolkata</div>
+      </div>
+    </div>
 
-    <label class="login-label" for="uid">Reviewer ID</label>
-    <input class="login-input" type="text" id="uid" placeholder="Enter your ID" autocomplete="username"/>
+    <h1>Sign in</h1>
+    <p class="tagline">Enter your reviewer credentials to access the portal.</p>
 
-    <label class="login-label" for="pwd">Password</label>
-    <input class="login-input" type="password" id="pwd" placeholder="Enter password" autocomplete="current-password"/>
+    <label for="uid">Reviewer ID</label>
+    <input type="text" id="uid" placeholder="Your ID" autocomplete="username" />
 
-    <button class="login-btn" id="login-btn" onclick="doLogin()">Access Portal →</button>
+    <label for="pwd">Password</label>
+    <input type="password" id="pwd" placeholder="Password" autocomplete="current-password" />
+
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Sign in</button>
     <div class="login-error" id="login-error">Incorrect credentials. Please try again.</div>
-    <div class="login-footer">Launching Compendium 2026 - Capital IIFT Kolkata</div>
   </div>
 </div>
 
-<!-- ==================== PORTAL ==================== -->
+<!-- ── PORTAL ── -->
 <div id="portal-screen">
-<div class="wrap">
-
-  <header class="masthead">
-    <div class="brand">Finance Compendium <b>·</b> Review Portal</div>
-    <div class="right">
-      <div class="meta">Capital<br>IIFT Kolkata</div>
-      <button class="logout-btn" onclick="doLogout()">Log out</button>
+  <nav class="topbar">
+    <div class="brand">
+      <div class="dot">FC</div>
+      Finance Compendium
     </div>
-  </header>
-
-  <section class="portal-hero">
-    <span class="kicker">Internal Review Access</span>
-    <h1>Finance Compendium<br>Chapter Library</h1>
-    <p>All nineteen chapters available for review. Click any card to open the chapter securely in a new tab.</p>
-  </section>
-
-  <div class="controls">
-    <div class="search-wrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input class="search-input" type="text" id="search" placeholder="Search chapters…" oninput="filterCards()"/>
+    <div class="topbar-right">
+      <span class="meta">Capital · IIFT Kolkata</span>
+      <button class="logout-btn" onclick="doLogout()">Sign out</button>
     </div>
-    <div class="stats-chips">
-      <div class="stat-chip"><b>19</b> Chapters</div>
-      <div class="stat-chip" id="visible-count"><b>19</b> Showing</div>
+  </nav>
+
+  <div class="main">
+    <div class="page-header">
+      <h1>Chapter Library</h1>
+      <p>19 chapters available. Click any card to open it in a new tab — you can highlight and annotate inside.</p>
     </div>
+
+    <div class="controls">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input class="search-input" type="text" id="search" placeholder="Search chapters…" oninput="filterCards()" />
+      </div>
+      <div class="count-chip" id="visible-count">19 chapters</div>
+    </div>
+
+    <div class="grid" id="chapter-grid"></div>
   </div>
-
-  <div class="grid" id="chapter-grid"></div>
-
-  <footer class="portal-footer">
-    <span>Finance Compendium · Internal Review Portal</span>
-    <span>Capital · IIFT Kolkata</span>
-  </footer>
-
-</div>
 </div>
 
 <script>
-  // ── IMPORTANT: Replace this with your actual backend URL ──
   const API = 'https://compendium-backend.onrender.com';
-
-  // ── TOKEN stored in memory (lost on tab close — intentional) ──
   let authToken = sessionStorage.getItem('_fc_token') || null;
 
   function authHeaders() {
@@ -204,35 +449,37 @@
   }
 
   const CHAPTERS = [
-    { num:1,  tag:"Orientation",    title:"The Finance Career Landscape",        desc:"Mapping the finance world — five buckets, a dozen very different careers, and how to pick your direction before placements.",          file:"Compendium_Chapter1.html",  ready:true },
-    { num:2,  tag:"Accounting",     title:"Accounting Foundations",              desc:"The accounting equation, double-entry logic, dual aspect, and the nine principles behind every financial statement.",                   file:"Compendium_Chapter2.html",  ready:true },
-    { num:3,  tag:"Statements",     title:"Balance Sheet & Income Statement",    desc:"The photograph and the movie — reading the P&L waterfall, Schedule III format, depreciation methods, and the tax shield.",             file:"Compendium_Chapter3.html",  ready:true },
-    { num:4,  tag:"Statements",     title:"Cash Flow & Statement Linkages",      desc:"Why profit ≠ cash, the three CFS buckets, indirect method walk, and the seven golden threads that tie all three statements together.", file:"Compendium_Chapter4.html",  ready:true },
-    { num:5,  tag:"Analysis",       title:"Ratio Analysis & DuPont",             desc:"Five ratio families, the Cash Conversion Cycle, 3-step and 5-step DuPont, and sector-specific benchmarks for Indian markets.",        file:"Compendium_Chapter5.html",  ready:true },
-    { num:6,  tag:"Valuation",      title:"TVM, NPV & IRR",                      desc:"Time value of money, annuities, perpetuities, WACC, NPV vs IRR conflict resolution, and the payback period — all with Indian examples.", file:"Compendium_Chapter6.html",  ready:true },
-    { num:7,  tag:"Modelling",      title:"DCF Modelling",                       desc:"Six-step DCF — FCFF build, terminal value (Gordon Growth & exit multiple), EV-to-equity bridge, sensitivity tables, and common pitfalls.", file:"Compendium_Chapter7.html",  ready:true },
-    { num:8,  tag:"Investing",      title:"Fundamental Analysis & Investing",    desc:"Top-down framework, five moat types, governance red flags, stock pitch structure, and eight behavioural biases to watch for.",         file:"Compendium_Chapter8.html",  ready:true },
-    { num:9,  tag:"Credit",         title:"Credit Risk",                         desc:"PD × LGD × EAD, the Four Cs, credit rating ladder, insolvency waterfall, IBC process, NPA classification, and SARFAESI.",             file:"Compendium_Chapter9.html",  ready:true },
-    { num:10, tag:"Derivatives",    title:"Derivatives & Fixed Income",          desc:"Forwards, futures, swaps, options, put-call parity, bond pricing, duration, convexity, and the RBI rate transmission chain.",          file:"Compendium_Chapter10.html", ready:true },
-    { num:11, tag:"Revision Hub",   title:"Revision Hub & Cheat Sheets",         desc:"All ten core-track chapters compressed — formula sheets, the golden thread diagram, 30 rapid-fire interview questions, and study tips.", file:"Compendium_Chapter11.html", ready:true },
-    { num:12, tag:"Valuation",      title:"Valuation in Practice",               desc:"Trading comps, precedent transactions, football field charts, sector-specific multiples, and six valuation pitfalls to avoid.",         file:"Compendium_Chapter12.html", ready:true },
-    { num:13, tag:"M&A",            title:"Mergers & Acquisitions",              desc:"Deal rationale, the M&A process timeline, synergies, accretion/dilution modelling, deal structures, goodwill, and India's regulatory gates.", file:"Compendium_Chapter13.html", ready:true },
-    { num:14, tag:"Banking",        title:"Banking & CAMELS",                    desc:"How banks make money, the bank P&L and balance sheet, CAMELS framework, NPA classification, Basel III capital, and P/B valuation.",    file:"Compendium_Chapter14.html", ready:true },
-    { num:15, tag:"Private Equity", title:"LBO Modelling",                       desc:"Leveraged buyout mechanics, the three return levers, sources & uses, debt tranches, IRR vs MOIC, and the Indian PE landscape.",        file:"Compendium_Chapter15.html", ready:true },
-    { num:16, tag:"Portfolio Mgmt", title:"Portfolio Management",                desc:"Diversification maths, efficient frontier, CAPM and beta, factor models, Sharpe/Treynor/alpha metrics, and institutional asset allocation.", file:"Compendium_Chapter16.html", ready:true },
-    { num:17, tag:"Markets",        title:"Financial Markets & Institutions",    desc:"India's financial system, four regulators, money vs capital markets, the full IPO process, ECM instruments, and FDI vs FPI.",          file:"Compendium_Chapter17.html", ready:true },
-    { num:18, tag:"Macro",          title:"Forex & Macro",                       desc:"What moves the rupee, parity conditions (IRP/PPP/Fisher), RBI's policy toolkit, fiscal deficit, and global Fed-to-India transmission.", file:"Compendium_Chapter18.html", ready:true },
-    { num:19, tag:"Placement Prep", title:"Interview FAQs & PI Experiences",     desc:"Technical questions by topic, behavioural frameworks, finance GK, and personal interview experiences from previous batches.",          file:"Compendium_Chapter19.html", ready:true },
+    { num:1,  tag:"Orientation",    title:"The Finance Career Landscape",        desc:"Mapping the finance world — five buckets, a dozen very different careers, and how to pick your direction before placements.",          file:"Compendium_Chapter1.html" },
+    { num:2,  tag:"Accounting",     title:"Accounting Foundations",              desc:"The accounting equation, double-entry logic, dual aspect, and the nine principles behind every financial statement.",                   file:"Compendium_Chapter2.html" },
+    { num:3,  tag:"Statements",     title:"Balance Sheet & Income Statement",    desc:"The photograph and the movie — reading the P&L waterfall, Schedule III format, depreciation methods, and the tax shield.",             file:"Compendium_Chapter3.html" },
+    { num:4,  tag:"Statements",     title:"Cash Flow & Statement Linkages",      desc:"Why profit ≠ cash, the three CFS buckets, indirect method walk, and the seven golden threads that tie all three statements together.", file:"Compendium_Chapter4.html" },
+    { num:5,  tag:"Analysis",       title:"Ratio Analysis & DuPont",             desc:"Five ratio families, the Cash Conversion Cycle, 3-step and 5-step DuPont, and sector-specific benchmarks for Indian markets.",        file:"Compendium_Chapter5.html" },
+    { num:6,  tag:"Valuation",      title:"TVM, NPV & IRR",                      desc:"Time value of money, annuities, perpetuities, WACC, NPV vs IRR conflict resolution, and the payback period — all with Indian examples.", file:"Compendium_Chapter6.html" },
+    { num:7,  tag:"Modelling",      title:"DCF Modelling",                       desc:"Six-step DCF — FCFF build, terminal value (Gordon Growth & exit multiple), EV-to-equity bridge, sensitivity tables, and common pitfalls.", file:"Compendium_Chapter7.html" },
+    { num:8,  tag:"Investing",      title:"Fundamental Analysis & Investing",    desc:"Top-down framework, five moat types, governance red flags, stock pitch structure, and eight behavioural biases to watch for.",         file:"Compendium_Chapter8.html" },
+    { num:9,  tag:"Credit",         title:"Credit Risk",                         desc:"PD × LGD × EAD, the Four Cs, credit rating ladder, insolvency waterfall, IBC process, NPA classification, and SARFAESI.",             file:"Compendium_Chapter9.html" },
+    { num:10, tag:"Derivatives",    title:"Derivatives & Fixed Income",          desc:"Forwards, futures, swaps, options, put-call parity, bond pricing, duration, convexity, and the RBI rate transmission chain.",          file:"Compendium_Chapter10.html" },
+    { num:11, tag:"Revision Hub",   title:"Revision Hub & Cheat Sheets",         desc:"All ten core-track chapters compressed — formula sheets, the golden thread diagram, 30 rapid-fire interview questions, and study tips.", file:"Compendium_Chapter11.html" },
+    { num:12, tag:"Valuation",      title:"Valuation in Practice",               desc:"Trading comps, precedent transactions, football field charts, sector-specific multiples, and six valuation pitfalls to avoid.",         file:"Compendium_Chapter12.html" },
+    { num:13, tag:"M&A",            title:"Mergers & Acquisitions",              desc:"Deal rationale, the M&A process timeline, synergies, accretion/dilution modelling, deal structures, goodwill, and India's regulatory gates.", file:"Compendium_Chapter13.html" },
+    { num:14, tag:"Banking",        title:"Banking & CAMELS",                    desc:"How banks make money, the bank P&L and balance sheet, CAMELS framework, NPA classification, Basel III capital, and P/B valuation.",    file:"Compendium_Chapter14.html" },
+    { num:15, tag:"Private Equity", title:"LBO Modelling",                       desc:"Leveraged buyout mechanics, the three return levers, sources & uses, debt tranches, IRR vs MOIC, and the Indian PE landscape.",        file:"Compendium_Chapter15.html" },
+    { num:16, tag:"Portfolio Mgmt", title:"Portfolio Management",                desc:"Diversification maths, efficient frontier, CAPM and beta, factor models, Sharpe/Treynor/alpha metrics, and institutional asset allocation.", file:"Compendium_Chapter16.html" },
+    { num:17, tag:"Markets",        title:"Financial Markets & Institutions",    desc:"India's financial system, four regulators, money vs capital markets, the full IPO process, ECM instruments, and FDI vs FPI.",          file:"Compendium_Chapter17.html" },
+    { num:18, tag:"Macro",          title:"Forex & Macro",                       desc:"What moves the rupee, parity conditions (IRP/PPP/Fisher), RBI's policy toolkit, fiscal deficit, and global Fed-to-India transmission.", file:"Compendium_Chapter18.html" },
+    { num:19, tag:"Placement Prep", title:"Interview FAQs & PI Experiences",     desc:"Technical questions by topic, behavioural frameworks, finance GK, and personal interview experiences from previous batches.",          file:"Compendium_Chapter19.html" },
   ];
 
-  // ── LOGIN ──────────────────────────────────────────────────────────
+  // ── LOGIN ──
   async function doLogin() {
     const id  = document.getElementById('uid').value.trim();
     const pwd = document.getElementById('pwd').value;
     const btn = document.getElementById('login-btn');
+    const err = document.getElementById('login-error');
 
+    err.classList.remove('show');
     btn.disabled = true;
-    btn.textContent = 'Checking…';
+    btn.textContent = 'Signing in…';
 
     try {
       const res = await fetch(`${API}/api/login`, {
@@ -247,43 +494,38 @@
         sessionStorage.setItem('_fc_token', authToken);
         showPortal();
       } else {
-        document.getElementById('login-error').classList.add('show');
+        err.textContent = 'Incorrect credentials. Please try again.';
+        err.classList.add('show');
         document.getElementById('pwd').value = '';
       }
     } catch (e) {
-      document.getElementById('login-error').textContent = 'Cannot reach server. Try again later or Connect with Admin.';
-      document.getElementById('login-error').classList.add('show');
+      err.textContent = 'Cannot reach server. Check your connection or contact the admin.';
+      err.classList.add('show');
     }
 
     btn.disabled = false;
-    btn.textContent = 'Access Portal →';
+    btn.textContent = 'Sign in';
   }
 
   async function doLogout() {
     try {
-      await fetch(`${API}/api/logout`, {
-        method: 'POST',
-        headers: authHeaders(),
-      });
-    } catch(e) { /* ignore */ }
-
+      await fetch(`${API}/api/logout`, { method: 'POST', headers: authHeaders() });
+    } catch(e) {}
     authToken = null;
     sessionStorage.removeItem('_fc_token');
     document.getElementById('portal-screen').style.display = 'none';
     document.getElementById('login-screen').style.display  = 'flex';
     document.getElementById('uid').value = '';
     document.getElementById('pwd').value = '';
-    document.getElementById('login-error').classList.remove('show');
   }
 
   document.addEventListener('keydown', e => {
     if (e.key === 'Enter' && document.getElementById('login-screen').style.display !== 'none') doLogin();
   });
 
-  // ── SESSION CHECK on load ──────────────────────────────────────────
+  // ── SESSION CHECK ──
   window.addEventListener('DOMContentLoaded', async () => {
     if (!authToken) return;
-
     try {
       const res  = await fetch(`${API}/api/session`, { headers: authHeaders() });
       const data = await res.json();
@@ -293,10 +535,10 @@
         authToken = null;
         sessionStorage.removeItem('_fc_token');
       }
-    } catch(e) { /* server unreachable, stay on login */ }
+    } catch(e) {}
   });
 
-  // ── PORTAL ────────────────────────────────────────────────────────
+  // ── PORTAL ──
   function showPortal() {
     document.getElementById('login-screen').style.display  = 'none';
     document.getElementById('portal-screen').style.display = 'block';
@@ -306,12 +548,10 @@
   async function openChapter(filename) {
     document.getElementById('loading-overlay').classList.add('show');
     try {
-      const res = await fetch(`${API}/api/chapter/${filename}`, {
-        headers: authHeaders(),
-      });
+      const res = await fetch(`${API}/api/chapter/${filename}`, { headers: authHeaders() });
 
       if (res.status === 401) {
-        alert('Session expired. Please log in again.');
+        alert('Session expired. Please sign in again.');
         doLogout();
         return;
       }
@@ -323,11 +563,8 @@
       const html = await res.text();
       const blob = new Blob([html], { type: 'text/html' });
       const url  = URL.createObjectURL(blob);
-
-      const tab = window.open(url, '_blank');
-
+      window.open(url, '_blank');
       setTimeout(() => URL.revokeObjectURL(url), 5000);
-
     } catch(e) {
       alert('Could not load chapter. Check your connection.');
     } finally {
@@ -335,25 +572,25 @@
     }
   }
 
-  // ── CARDS ─────────────────────────────────────────────────────────
+  // ── CARDS ──
   function renderCards(chapters) {
     const grid = document.getElementById('chapter-grid');
-    grid.innerHTML = `<div class="no-results" id="no-results-msg" style="display:none">No chapters match your search.</div>`;
+    grid.innerHTML = '<div class="no-results" id="no-results-msg">No chapters match your search.</div>';
 
     chapters.forEach((ch, i) => {
       const card = document.createElement('div');
-      card.style.animationDelay = `${i * 40}ms`;
       card.className = 'chapter-card';
+      card.style.animationDelay = `${i * 30}ms`;
       card.onclick = () => openChapter(ch.file);
       card.innerHTML = `
-        <div class="card-num">${String(ch.num).padStart(2,'0')}</div>
-        <div class="card-body">
-          <span class="card-tag">Ch. ${String(ch.num).padStart(2,'0')} · ${ch.tag}</span>
-          <div class="card-title">${ch.title}</div>
-          <div class="card-desc">${ch.desc}</div>
+        <div class="card-top">
+          <span class="card-num">Ch. ${String(ch.num).padStart(2,'0')}</span>
+          <span class="card-tag">${ch.tag}</span>
         </div>
+        <div class="card-title">${ch.title}</div>
+        <div class="card-desc">${ch.desc}</div>
         <div class="card-footer">
-          <span class="card-file" style="color:var(--green);font-weight:500">● Available</span>
+          <span class="card-status">● Available</span>
           <div class="card-arrow">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
               <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -375,7 +612,7 @@
     renderCards(filtered);
     const noMsg = document.getElementById('no-results-msg');
     if (noMsg) noMsg.style.display = filtered.length === 0 ? 'block' : 'none';
-    document.getElementById('visible-count').innerHTML = `<b>${filtered.length}</b> Showing`;
+    document.getElementById('visible-count').textContent = `${filtered.length} chapter${filtered.length !== 1 ? 's' : ''}`;
   }
 </script>
 </body>
