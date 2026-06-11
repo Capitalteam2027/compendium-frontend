@@ -104,9 +104,36 @@
   .chapter-card:hover .card-arrow svg{color:#fff}
   .card-arrow svg{width:13px;height:13px;color:var(--navy);transition:color .2s}
 
+  /* Annotation badges on cards */
+  .card-annot-badges{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .card-annot-badge{
+    font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.06em;
+    padding:3px 8px;border-radius:10px;font-weight:600;display:inline-flex;align-items:center;gap:4px;
+  }
+  .card-annot-open{background:#fff3e0;color:#e65100}
+  .card-annot-resolved{background:var(--green-tint);color:#2e7d32}
+  .card-annot-none{color:#bbb;font-family:var(--mono);font-size:10px}
+
   .no-results{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--ink-soft);font-family:var(--mono);font-size:13px;letter-spacing:.08em;text-transform:uppercase;display:none}
 
   .portal-footer{border-top:1.5px solid var(--ink);padding:20px 0 50px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-soft);flex-wrap:wrap;gap:8px}
+
+  /* ── Global annotation summary bar ── */
+  .annot-summary-bar{
+    display:flex;gap:16px;padding:16px 24px;background:var(--card);
+    border:1.5px solid var(--border);border-radius:12px;margin-bottom:28px;
+    align-items:center;flex-wrap:wrap;
+  }
+  .annot-summary-stat{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--ink-soft)}
+  .annot-summary-stat b{font-size:18px;color:var(--navy);display:block;line-height:1.2}
+  .annot-summary-stat.errors b{color:#c0392b}
+  .annot-summary-divider{width:1px;height:32px;background:var(--border)}
+  .export-all-btn{
+    margin-left:auto;font-family:var(--mono);font-size:10px;text-transform:uppercase;
+    letter-spacing:.1em;padding:8px 16px;border:1.5px solid var(--navy);border-radius:8px;
+    background:transparent;color:var(--navy);cursor:pointer;font-weight:600;transition:all .15s;
+  }
+  .export-all-btn:hover{background:var(--navy);color:#fff}
 
   /* loading overlay */
   #loading-overlay{
@@ -122,6 +149,9 @@
     .login-box{padding:38px 28px 34px}
     .wrap{padding:0 18px}
     .grid{grid-template-columns:1fr}
+    .annot-summary-bar{flex-direction:column;align-items:flex-start;gap:10px}
+    .annot-summary-divider{display:none}
+    .export-all-btn{margin-left:0}
   }
 </style>
 </head>
@@ -166,8 +196,11 @@
   <section class="portal-hero">
     <span class="kicker">Internal Review Access</span>
     <h1>Finance Compendium<br>Chapter Library</h1>
-    <p>All nineteen chapters available for review. Click any card to open the chapter securely in a new tab.</p>
+    <p>All nineteen chapters available for review. Select text inside any chapter to highlight and annotate corrections.</p>
   </section>
+
+  <!-- Annotation summary bar (populated after stats load) -->
+  <div class="annot-summary-bar" id="annot-summary-bar" style="display:none"></div>
 
   <div class="controls">
     <div class="search-wrap">
@@ -194,8 +227,11 @@
   // ── IMPORTANT: Replace this with your actual backend URL ──
   const API = 'https://compendium-backend.onrender.com';
 
-  // ── TOKEN stored in memory (lost on tab close — intentional) ──
+  // ── TOKEN stored in localStorage ──
   let authToken = localStorage.getItem('_fc_token') || null;
+
+  // Annotation stats per chapter (populated after login)
+  let annotStats = {};
 
   function authHeaders() {
     const h = { 'Content-Type': 'application/json' };
@@ -300,10 +336,94 @@
   });
 
   // ── PORTAL ────────────────────────────────────────────────────────
-  function showPortal() {
+  async function showPortal() {
     document.getElementById('login-screen').style.display  = 'none';
     document.getElementById('portal-screen').style.display = 'block';
     renderCards(CHAPTERS);
+    await loadAnnotationStats();
+  }
+
+  // ── LOAD ANNOTATION STATS ──────────────────────────────────────────
+  async function loadAnnotationStats() {
+    try {
+      const res = await fetch(`${API}/api/annotations/stats`, { headers: authHeaders() });
+      const data = await res.json();
+      annotStats = data.stats || {};
+      renderAnnotationSummary();
+      renderCards(CHAPTERS); // re-render with badges
+    } catch(e) { console.warn('Could not load annotation stats', e); }
+  }
+
+  function renderAnnotationSummary() {
+    const bar = document.getElementById('annot-summary-bar');
+    const allStats = Object.values(annotStats);
+    if (allStats.length === 0) { bar.style.display = 'none'; return; }
+
+    const totalAnnot = allStats.reduce((s,c) => s + c.total, 0);
+    const totalOpen  = allStats.reduce((s,c) => s + c.open, 0);
+    const totalDone  = allStats.reduce((s,c) => s + c.resolved, 0);
+    const chaptersWithNotes = allStats.length;
+
+    // Count total errors across all chapters
+    let totalErrors = 0;
+    allStats.forEach(c => { totalErrors += (c.byCategory && c.byCategory.error) || 0; });
+
+    bar.style.display = 'flex';
+    bar.innerHTML =
+      '<div class="annot-summary-stat"><b>' + totalAnnot + '</b>Total Notes</div>' +
+      '<div class="annot-summary-divider"></div>' +
+      '<div class="annot-summary-stat"><b>' + totalOpen + '</b>Open</div>' +
+      '<div class="annot-summary-divider"></div>' +
+      '<div class="annot-summary-stat"><b>' + totalDone + '</b>Resolved</div>' +
+      '<div class="annot-summary-divider"></div>' +
+      '<div class="annot-summary-stat errors"><b>' + totalErrors + '</b>Errors</div>' +
+      '<div class="annot-summary-divider"></div>' +
+      '<div class="annot-summary-stat"><b>' + chaptersWithNotes + '/19</b>Chapters Reviewed</div>' +
+      '<button class="export-all-btn" onclick="exportAllAnnotations()">Export All Notes</button>';
+  }
+
+  // ── EXPORT ALL ─────────────────────────────────────────────────────
+  async function exportAllAnnotations() {
+    try {
+      const res = await fetch(`${API}/api/annotations`, { headers: authHeaders() });
+      const data = await res.json();
+      const all = data.annotations || [];
+      if (all.length === 0) { alert('No annotations to export.'); return; }
+
+      // Group by chapter
+      const grouped = {};
+      all.forEach(a => {
+        if (!grouped[a.chapter]) grouped[a.chapter] = [];
+        grouped[a.chapter].push(a);
+      });
+
+      let text = 'FINANCE COMPENDIUM — FULL ANNOTATION REPORT\n';
+      text += 'Exported: ' + new Date().toLocaleString('en-IN') + '\n';
+      text += 'Total annotations: ' + all.length + '\n';
+      text += 'Open: ' + all.filter(a=>!a.resolved).length + ' | Resolved: ' + all.filter(a=>a.resolved).length + '\n';
+      text += '='.repeat(70) + '\n\n';
+
+      Object.keys(grouped).sort().forEach(ch => {
+        const notes = grouped[ch];
+        text += '── ' + ch + ' (' + notes.length + ' notes) ──\n\n';
+        notes.forEach((a, i) => {
+          text += '  ' + (i+1) + '. [' + (a.category || 'note').toUpperCase() + '] ' + (a.resolved ? '(RESOLVED)' : '(OPEN)') + '\n';
+          text += '     Quote: "' + (a.quote || '') + '"\n';
+          text += '     Note:  ' + a.note + '\n';
+          text += '     By: ' + a.userId + ' | ' + new Date(a.ts).toLocaleString('en-IN') + '\n\n';
+        });
+      });
+
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'compendium_annotations_full_' + new Date().toISOString().slice(0,10) + '.txt';
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch(e) {
+      alert('Could not export. Check your connection.');
+    }
   }
 
   async function openChapter(filename) {
@@ -356,6 +476,20 @@
       card.style.animationDelay = `${i * 40}ms`;
       card.className = 'chapter-card';
       card.onclick = () => openChapter(ch.file);
+
+      // Find annotation stats for this chapter (match by title since that's what document.title gives)
+      let badgeHTML = '<span class="card-annot-none">No notes yet</span>';
+      const chapterStats = findStatsForChapter(ch);
+      if (chapterStats) {
+        badgeHTML = '';
+        if (chapterStats.open > 0) {
+          badgeHTML += '<span class="card-annot-badge card-annot-open">' + chapterStats.open + ' open</span>';
+        }
+        if (chapterStats.resolved > 0) {
+          badgeHTML += '<span class="card-annot-badge card-annot-resolved">' + chapterStats.resolved + ' done</span>';
+        }
+      }
+
       card.innerHTML = `
         <div class="card-num">${String(ch.num).padStart(2,'0')}</div>
         <div class="card-body">
@@ -364,7 +498,7 @@
           <div class="card-desc">${ch.desc}</div>
         </div>
         <div class="card-footer">
-          <span class="card-file" style="color:var(--green);font-weight:500">● Available</span>
+          <div class="card-annot-badges">${badgeHTML}</div>
           <div class="card-arrow">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
               <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -373,6 +507,22 @@
         </div>`;
       grid.insertBefore(card, document.getElementById('no-results-msg'));
     });
+  }
+
+  // Match annotation stats keys (document.title) to chapter file names
+  function findStatsForChapter(ch) {
+    // Stats are keyed by document.title of the chapter HTML
+    // We try matching by chapter number in the key or filename
+    for (const key of Object.keys(annotStats)) {
+      const keyLower = key.toLowerCase();
+      // Match by filename reference
+      if (keyLower.includes('chapter ' + ch.num) || keyLower.includes('chapter' + ch.num) ||
+          keyLower.includes(ch.title.toLowerCase().slice(0, 20))) {
+        return annotStats[key];
+      }
+    }
+    // Also try exact key match with known title patterns
+    return null;
   }
 
   function filterCards() {
